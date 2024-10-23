@@ -1,3 +1,5 @@
+import GridView from "../components/GridView";
+
 export default function Uploder() {
   return (
     <div>
@@ -12,7 +14,7 @@ export default function Uploder() {
 
           <input className="hidden" id="file-input" type="file" />
         </div>
-        
+        <GridView />
       </div>
     </div>
   );
