@@ -4,7 +4,7 @@ import Uploder from "./components/Uploader";
 function App() {
   return (
     <div>
-      <Uploder />
+      <Uploder/>
     </div>
   );
 }

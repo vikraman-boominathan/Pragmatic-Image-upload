@@ -11,7 +11,7 @@ export default function GridView({images}) {
             key={index}
             src={img.dataUrl}
             alt={`image-${img.name}`}
-            className="w-full h-auto rounded-lg"
+            className="w-full h-auto   rounded-lg "
           />
           
         ))}

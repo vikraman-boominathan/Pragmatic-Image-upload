@@ -4,30 +4,37 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { dropTargetForExternal } from "@atlaskit/pragmatic-drag-and-drop/external/adapter";
 import { containsFiles } from "@atlaskit/pragmatic-drag-and-drop/external/file";
 import { monitorForExternal } from "@atlaskit/pragmatic-drag-and-drop/external/adapter";
-import { getFiles } from '@atlaskit/pragmatic-drag-and-drop/external/file';
-
+import { getFiles } from "@atlaskit/pragmatic-drag-and-drop/external/file";
 
 export default function Uploder() {
   const [hover, setHover] = useState(false);
   const ref = useRef(null);
-  const [uploads, setUploads] = useState([])
+  const inputRef = useRef(null);
+  const [uploads, setUploads] = useState([]);
+
+  const handleClick = useCallback(() => {
+    inputRef.current.click();
+  }, []);
 
   const addUpload = useCallback((file) => {
-    if(!file || !file.type.startsWith("image/")) return;
-
-    console.log("addupload", file)
+    if (!file || !file.type.startsWith("image/")) return;
 
     const upload = {
-      type: 'image',
+      type: "image",
       dataUrl: URL.createObjectURL(file),
       name: file.name,
-      size: file.size
-    }
-    setUploads(pre => [...pre, upload])
-    console.log("upload", upload)
-    console.log("uploads",  uploads)
+      size: file.size,
+    };
+    setUploads((pre) => [...pre, upload]);
+  });
 
-  })
+  const pickFile = useCallback(
+    (e) => {
+      const clickFile = Array.from(e.currentTarget.files);
+      clickFile.forEach(addUpload);
+    },
+    [addUpload]
+  );
 
   useEffect(() => {
     const file = ref.current;
@@ -36,23 +43,23 @@ export default function Uploder() {
       element: file,
       canDrop: containsFiles,
       onDragEnter: () => {
-        setHover(true)
-        console.log("Some external data was dragged over me")
+        setHover(true);
       },
-      onDrop: async({source})=> {
-        const fl= getFiles({ source });
-        fl.forEach(addUpload)
-      }
+      onDrop: async ({ source }) => {
+        const fl = getFiles({ source });
+        fl.forEach(addUpload);
+      },
     });
 
-    const monitor = monitorForExternal({
-      canMonitor: containsFiles,
-      onDragStart: () => console.log("A file is being dragged"),
-      onDrop({ source }) {
-        const fl = getFiles({ source });
-        console.log(fl)
-    },
-    }, [addUpload]);
+    const monitor = monitorForExternal(
+      {
+        canMonitor: containsFiles,
+        onDrop({ source }) {
+          const fl = getFiles({ source });
+        },
+      },
+      [addUpload]
+    );
 
     return () => {
       fileDrop();
@@ -72,7 +79,10 @@ export default function Uploder() {
           <strong className="flex items-center gap-2 text-gray-500">
             Drop some images here!
           </strong>
-          <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+          <button
+            onClick={handleClick}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
             Select images
           </button>
 
@@ -80,6 +90,10 @@ export default function Uploder() {
             className="hidden"
             id="file-input"
             type="file"
+            accept="image/"
+            ref={inputRef}
+            onChange={pickFile}
+            multiple
           />
         </div>
         <GridView images={uploads} />
